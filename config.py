@@ -11,10 +11,11 @@ config_dir.mkdir(exist_ok=True)
 
 
 class Bot:
+    # Change admins to be a list
     bot = {
         "api_id": 28776072,
         "api_hash": "b3a786dce1f4e7d56674b7cadfde3c9d",
-        "admins": 7711039923
+        "admins": []  # Initialize as an empty list
     }
 
     def get_config(self) -> dict:
@@ -26,14 +27,14 @@ class Bot:
                            " values. You can find them on " +
                            "https://my.telegram.org/apps.\n" +
                            "you can also use the API_ID and API_HASH " +
-                           "envinroment variables.")
+                           "environment variables.")
 
             with open(config_dir/"bot.json", "w") as f:
                 json.dump(self.bot, f, indent=4, ensure_ascii=False)
 
             if not os.getenv("API_ID") or not os.getenv("API_HASH"):
                 logger.error("API_ID and API_HASH environment variables not " +
-                             " found please add them to your environment " +
+                             "found please add them to your environment " +
                              "variables.")
                 logger.error("Exiting...")
                 exit(1)
@@ -43,8 +44,13 @@ class Bot:
 
     def add_admin(self, admin: int) -> None:
         """Add an admin to the bot configuration."""
-        if admin not in self.get_config()["admins"]:
-            config = self.get_config()
+        config = self.get_config()
+        
+        # Ensure admins is a list
+        if not isinstance(config["admins"], list):
+            config["admins"] = []
+
+        if admin not in config["admins"]:
             config["admins"].append(admin)
 
             with open(config_dir/"bot.json", "w") as f:
